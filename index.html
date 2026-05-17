@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bike Racing Game</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    font-family:Arial;
+    background:#87CEEB;
+    touch-action:none;
+}
+
+#game{
+    width:100%;
+    height:100vh;
+    position:relative;
+    overflow:hidden;
+    background:
+    linear-gradient(
+        to bottom,
+        #87CEEB 0%,
+        #87CEEB 45%,
+        #4CAF50 45%,
+        #4CAF50 100%
+    );
+}
+
+/* ROAD */
+
+#road{
+    position:absolute;
+    width:90%;
+    max-width:420px;
+    height:100%;
+    background:#333;
+    left:50%;
+    transform:translateX(-50%);
+    overflow:hidden;
+    border-left:8px solid white;
+    border-right:8px solid white;
+    transition:left 0.1s linear;
+}
+
+/* ROAD LINES */
+
+.line{
+    position:absolute;
+    width:10px;
+    height:90px;
+    background:white;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+/* PLAYER BIKE */
+
+#bike{
+    position:absolute;
+    width:60px;
+    height:110px;
+    background:red;
+    border-radius:15px;
+    bottom:40px;
+    left:150px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+/* ENEMY CARS */
+
+.enemy{
+    position:absolute;
+    width:60px;
+    height:110px;
+    background:yellow;
+    border-radius:15px;
+    top:-150px;
+    box-shadow:0 0 15px rgba(0,0,0,0.5);
+}
+
+/* BULLETS */
+
+.bullet{
+    position:absolute;
+    width:10px;
+    height:25px;
+    background:orange;
+    border-radius:10px;
+}
+
+/* SCORE */
+
+#score{
+    position:absolute;
+    top:20px;
+    left:20px;
+    color:white;
+    font-size:28px;
+    z-index:20;
+    text-shadow:2px 2px 5px black;
+}
+
+/* START SCREEN */
+
+#start{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.8);
+    z-index:100;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+    font-size:28px;
+    padding:20px;
+}
+
+/* LEVEL BUTTONS */
+
+.levelBtn{
+
+    width:220px;
+
+    padding:18px;
+
+    margin:10px;
+
+    font-size:24px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:white;
+
+    cursor:pointer;
+
+    font-weight:bold;
+}
+
+/* MOBILE BUTTONS */
+
+#controls{
+    position:absolute;
+    bottom:20px;
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    padding:0 20px;
+    z-index:50;
+}
+
+.btn{
+    width:85px;
+    height:85px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.3);
+    color:white;
+    font-size:38px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    user-select:none;
+    backdrop-filter:blur(5px);
+}
+
+</style>
+</head>
+<body>
+
+<div id="game">
+
+    <div id="score">Score : 0</div>
+
+    <div id="start">
+
+        <h1>🏍 BIKE RACING</h1>
+
+        <br>
+
+        SELECT LEVEL
+
+        <br><br>
+
+        <button class="levelBtn"
+        onclick="setDifficulty('easy')">
+            EASY
+        </button>
+
+        <button class="levelBtn"
+        onclick="setDifficulty('medium')">
+            MEDIUM
+        </button>
+
+        <button class="levelBtn"
+        onclick="setDifficulty('hard')">
+            HARD
+        </button>
+
+        <br><br>
+
+        ◀ ▶ Move <br>
+        ⬇ Brake
+
+    </div>
+
+    <div id="road">
+
+        <div id="bike"></div>
+
+    </div>
+
+    <div id="controls">
+
+        <div class="btn" id="leftBtn">◀</div>
+
+        <div class="btn" id="brakeBtn">⬇</div>
+
+        <div class="btn" id="rightBtn">▶</div>
+
+    </div>
+
+</div>
+
+<script>
+
+const road = document.getElementById("road");
+const bike = document.getElementById("bike");
+const scoreBox = document.getElementById("score");
+const startScreen = document.getElementById("start");
+
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
+const brakeBtn = document.getElementById("brakeBtn");
+
+let keys = {
+    left:false,
+    right:false,
+    brake:false
+};
+
+let player = {
+    x:150,
+    speed:8,
+    score:0
+};
+
+let enemies = [];
+let bullets = [];
+
+let gameRunning = false;
+let animationId;
+let curve = 0;
+
+let enemyCount = 5;
+let bulletSpeed = 12;
+let gameSpeed = 8;
+
+/* ROAD LINES */
+
+for(let i=0;i<8;i++){
+
+    let line = document.createElement("div");
+
+    line.classList.add("line");
+
+    line.y = i * 150;
+
+    line.style.top = line.y + "px";
+
+    road.appendChild(line);
+}
+
+/* CREATE ENEMIES */
+
+function createEnemies(){
+
+    enemies.forEach(enemy => enemy.remove());
+
+    enemies = [];
+
+    for(let i=0;i<enemyCount;i++){
+
+        let enemy = document.createElement("div");
+
+        enemy.classList.add("enemy");
+
+        enemy.style.left =
+        Math.floor(Math.random()*280) + "px";
+
+        enemy.style.top = -(i * 300) + "px";
+
+        road.appendChild(enemy);
+
+        enemies.push(enemy);
+    }
+}
+
+/* SHOOT BULLET */
+
+function shootBullet(enemy){
+
+    let bullet = document.createElement("div");
+
+    bullet.classList.add("bullet");
+
+    bullet.style.left =
+    (enemy.offsetLeft + 25) + "px";
+
+    bullet.style.top =
+    (enemy.offsetTop + 100) + "px";
+
+    road.appendChild(bullet);
+
+    bullets.push(bullet);
+}
+
+/* ENEMY SHOOTING */
+
+setInterval(()=>{
+
+    if(gameRunning){
+
+        let randomEnemy =
+        enemies[Math.floor(
+            Math.random()*enemies.length
+        )];
+
+        shootBullet(randomEnemy);
+    }
+
+},1200);
+
+/* DIFFICULTY */
+
+function setDifficulty(level){
+
+    if(level === "easy"){
+
+        enemyCount = 4;
+        gameSpeed = 6;
+        bulletSpeed = 8;
+    }
+
+    if(level === "medium"){
+
+        enemyCount = 6;
+        gameSpeed = 8;
+        bulletSpeed = 12;
+    }
+
+    if(level === "hard"){
+
+        enemyCount = 9;
+        gameSpeed = 11;
+        bulletSpeed = 18;
+    }
+
+    startGame();
+}
+
+/* KEYBOARD */
+
+document.addEventListener("keydown",(e)=>{
+
+    if(e.key === "ArrowLeft"){
+        keys.left = true;
+    }
+
+    if(e.key === "ArrowRight"){
+        keys.right = true;
+    }
+
+    if(e.key === "ArrowDown"){
+        keys.brake = true;
+    }
+
+});
+
+document.addEventListener("keyup",(e)=>{
+
+    if(e.key === "ArrowLeft"){
+        keys.left = false;
+    }
+
+    if(e.key === "ArrowRight"){
+        keys.right = false;
+    }
+
+    if(e.key === "ArrowDown"){
+        keys.brake = false;
+    }
+
+});
+
+/* MOBILE */
+
+leftBtn.addEventListener("touchstart",()=>{
+    keys.left = true;
+});
+
+leftBtn.addEventListener("touchend",()=>{
+    keys.left = false;
+});
+
+rightBtn.addEventListener("touchstart",()=>{
+    keys.right = true;
+});
+
+rightBtn.addEventListener("touchend",()=>{
+    keys.right = false;
+});
+
+brakeBtn.addEventListener("touchstart",()=>{
+    keys.brake = true;
+});
+
+brakeBtn.addEventListener("touchend",()=>{
+    keys.brake = false;
+});
+
+/* START GAME */
+
+function startGame(){
+
+    gameRunning = true;
+
+    player.score = 0;
+
+    player.x = 150;
+
+    curve = 0;
+
+    bike.style.left = player.x + "px";
+
+    scoreBox.innerHTML = "Score : 0";
+
+    startScreen.style.display = "none";
+
+    createEnemies();
+
+    bullets.forEach(b => b.remove());
+
+    bullets = [];
+
+    cancelAnimationFrame(animationId);
+
+    animationId =
+    requestAnimationFrame(playGame);
+}
+
+/* MOVE ROAD */
+
+function moveRoad(){
+
+    curve += 0.02;
+
+    let roadMove =
+    Math.sin(curve) * 100;
+
+    road.style.left =
+    `calc(50% + ${roadMove}px)`;
+
+    bike.style.transform =
+    `rotate(${roadMove/15}deg)`;
+}
+
+/* MOVE ROAD LINES */
+
+function moveLines(){
+
+    document.querySelectorAll(".line")
+    .forEach((line)=>{
+
+        if(line.y >= window.innerHeight){
+
+            line.y = -120;
+        }
+
+        line.y += player.speed;
+
+        line.style.top =
+        line.y + "px";
+    });
+}
+
+/* MOVE ENEMIES */
+
+function moveEnemies(){
+
+    enemies.forEach((enemy)=>{
+
+        let top =
+        parseInt(enemy.style.top);
+
+        if(top > window.innerHeight){
+
+            enemy.style.top = "-200px";
+
+            enemy.style.left =
+            Math.floor(Math.random()*280)
+            + "px";
+
+            player.score++;
+
+            scoreBox.innerHTML =
+            "Score : " + player.score;
+
+        }else{
+
+            enemy.style.top =
+            top + player.speed + "px";
+        }
+
+        let bikeRect =
+        bike.getBoundingClientRect();
+
+        let enemyRect =
+        enemy.getBoundingClientRect();
+
+        if(
+
+            bikeRect.left < enemyRect.right &&
+            bikeRect.right > enemyRect.left &&
+            bikeRect.top < enemyRect.bottom &&
+            bikeRect.bottom > enemyRect.top
+
+        ){
+
+            endGame();
+        }
+
+    });
+}
+
+/* MOVE BULLETS */
+
+function moveBullets(){
+
+    bullets.forEach((bullet,index)=>{
+
+        let top =
+        parseInt(bullet.style.top);
+
+        bullet.style.top =
+        top + bulletSpeed + "px";
+
+        if(top > window.innerHeight){
+
+            bullet.remove();
+
+            bullets.splice(index,1);
+        }
+
+        let bikeRect =
+        bike.getBoundingClientRect();
+
+        let bulletRect =
+        bullet.getBoundingClientRect();
+
+        if(
+
+            bikeRect.left < bulletRect.right &&
+            bikeRect.right > bulletRect.left &&
+            bikeRect.top < bulletRect.bottom &&
+            bikeRect.bottom > bulletRect.top
+
+        ){
+
+            endGame();
+        }
+
+    });
+}
+
+/* GAME LOOP */
+
+function playGame(){
+
+    if(!gameRunning) return;
+
+    if(keys.brake){
+
+        player.speed = 3;
+
+    }else{
+
+        player.speed = gameSpeed;
+    }
+
+    moveRoad();
+
+    moveLines();
+
+    moveEnemies();
+
+    moveBullets();
+
+    if(keys.left && player.x > 0){
+
+        player.x -= player.speed;
+    }
+
+    if(keys.right && player.x < 300){
+
+        player.x += player.speed;
+    }
+
+    bike.style.left =
+    player.x + "px";
+
+    animationId =
+    requestAnimationFrame(playGame);
+}
+
+/* END GAME */
+
+function endGame(){
+
+    gameRunning = false;
+
+    cancelAnimationFrame(animationId);
+
+    startScreen.style.display = "flex";
+
+    startScreen.innerHTML =
+
+    `
+    <h1>GAME OVER</h1>
+
+    <br>
+
+    SCORE : ${player.score}
+
+    <br><br>
+
+    <button class="levelBtn"
+    onclick="location.reload()">
+        PLAY AGAIN
+    </button>
+    `;
+}
+
+</script>
+
+</body>
+</html>

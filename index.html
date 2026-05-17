@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
 
-<title>Realistic Bike Racing</title>
+<title>Ultimate Bike Racing</title>
 
 <style>
 
@@ -14,15 +18,19 @@
     box-sizing:border-box;
 }
 
-body{
+html,body{
+    width:100%;
+    height:100%;
     overflow:hidden;
+    touch-action:none;
     font-family:Arial;
     background:#87CEEB;
-    touch-action:none;
 }
 
+/* GAME */
+
 #game{
-    width:100%;
+    width:100vw;
     height:100vh;
     position:relative;
     overflow:hidden;
@@ -31,8 +39,8 @@ body{
         to bottom,
         #87CEEB 0%,
         #87CEEB 45%,
-        #3e9d3e 45%,
-        #3e9d3e 100%
+        #3fa63f 45%,
+        #3fa63f 100%
     );
 }
 
@@ -40,27 +48,15 @@ body{
 
 #road{
     position:absolute;
-    width:90%;
-    max-width:420px;
+    width:min(100vw,500px);
     height:100%;
-    background:#333;
     left:50%;
     transform:translateX(-50%);
+    background:#333;
     overflow:hidden;
-    border-left:8px solid white;
-    border-right:8px solid white;
+    border-left:5px solid white;
+    border-right:5px solid white;
     transition:left 0.08s linear;
-}
-
-/* ROAD WATER */
-
-.water{
-    position:absolute;
-    width:70px;
-    height:120px;
-    background:rgba(0,150,255,0.4);
-    border-radius:50%;
-    filter:blur(2px);
 }
 
 /* ROAD LINES */
@@ -74,28 +70,40 @@ body{
     transform:translateX(-50%);
 }
 
-/* PLAYER BIKE */
+/* WATER */
+
+.water{
+    position:absolute;
+    width:70px;
+    height:120px;
+    background:rgba(0,150,255,0.4);
+    border-radius:50%;
+    filter:blur(2px);
+}
+
+/* PLAYER */
 
 #bike{
     position:absolute;
-    width:60px;
-    height:110px;
+    width:55px;
+    height:100px;
     background:red;
-    border-radius:16px;
-    bottom:40px;
-    left:160px;
-    transition:transform 0.1s;
+    border-radius:14px;
+    bottom:80px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:10;
     box-shadow:0 0 15px rgba(0,0,0,0.5);
 }
 
-/* ENEMY */
+/* ENEMIES */
 
 .enemy{
     position:absolute;
-    width:60px;
-    height:110px;
+    width:55px;
+    height:100px;
     background:gold;
-    border-radius:16px;
+    border-radius:14px;
     top:-150px;
     box-shadow:0 0 15px rgba(0,0,0,0.5);
 }
@@ -108,7 +116,7 @@ body{
     height:10px;
     background:orange;
     border-radius:50%;
-    top:45px;
+    top:40px;
     opacity:0;
 }
 
@@ -138,7 +146,7 @@ body{
 .bullet{
     position:absolute;
     width:10px;
-    height:25px;
+    height:24px;
     background:orange;
     border-radius:10px;
 }
@@ -147,69 +155,85 @@ body{
 
 #score{
     position:absolute;
-    top:20px;
-    left:20px;
+    top:15px;
+    left:15px;
     color:white;
-    font-size:28px;
-    z-index:50;
+    font-size:26px;
+    z-index:100;
     text-shadow:2px 2px 5px black;
 }
 
-/* START SCREEN */
+/* START */
 
 #start{
     position:absolute;
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.85);
-    z-index:100;
+    background:rgba(0,0,0,0.88);
+    z-index:200;
     display:flex;
     justify-content:center;
     align-items:center;
     flex-direction:column;
-    color:white;
     text-align:center;
-    font-size:26px;
+    color:white;
     padding:20px;
 }
-
-/* BUTTONS */
 
 .levelBtn{
     width:220px;
     padding:18px;
     margin:10px;
+    font-size:24px;
     border:none;
     border-radius:12px;
-    font-size:24px;
-    font-weight:bold;
     cursor:pointer;
+    font-weight:bold;
 }
 
-/* MOBILE */
+/* CONTROLS */
 
 #controls{
     position:absolute;
-    bottom:20px;
     width:100%;
+    bottom:12px;
     display:flex;
     justify-content:space-between;
-    padding:0 20px;
-    z-index:50;
+    padding:0 12px;
+    z-index:100;
 }
 
 .btn{
-    width:85px;
-    height:85px;
+    width:75px;
+    height:75px;
     border-radius:50%;
-    background:rgba(255,255,255,0.3);
-    backdrop-filter:blur(5px);
+    background:rgba(255,255,255,0.25);
     color:white;
-    font-size:40px;
     display:flex;
     justify-content:center;
     align-items:center;
+    font-size:34px;
+    backdrop-filter:blur(5px);
     user-select:none;
+}
+
+@media(min-width:700px){
+
+    #road{
+        width:500px;
+    }
+
+    .btn{
+        width:85px;
+        height:85px;
+        font-size:40px;
+    }
+
+    #bike,
+    .enemy{
+        width:60px;
+        height:110px;
+    }
 }
 
 </style>
@@ -222,7 +246,7 @@ body{
 
     <div id="start">
 
-        <h1>🏍 REALISTIC BIKE RACING</h1>
+        <h1>🏍 ULTIMATE BIKE RACING</h1>
 
         <br>
 
@@ -247,8 +271,8 @@ body{
 
         <br><br>
 
-        ◀ ▶ Move <br>
-        ⬇ Brake
+        ◀ ▶ MOVE <br>
+        ⬇ BRAKE
 
     </div>
 
@@ -288,7 +312,7 @@ let keys = {
 };
 
 let player = {
-    x:160,
+    x:0,
     speed:8,
     score:0
 };
@@ -299,45 +323,91 @@ let bullets = [];
 let gameRunning = false;
 let animationId;
 
-let enemyCount = 5;
-let gameSpeed = 8;
-let bulletSpeed = 10;
 let difficulty = "easy";
+
+let enemyCount = 4;
+let bulletSpeed = 8;
+let gameSpeed = 6;
+
+let lanes = [];
 
 let curve = 0;
 
-const lanes = [20,110,200,290];
+/* RESPONSIVE LANES */
+
+function setupLanes(){
+
+    const roadWidth =
+    road.offsetWidth;
+
+    const laneCount = 4;
+
+    const spacing =
+    (roadWidth - 80) / laneCount;
+
+    lanes = [];
+
+    for(let i=0;i<laneCount;i++){
+
+        lanes.push(
+            15 + (i * spacing)
+        );
+    }
+}
+
+/* FULLSCREEN */
+
+function enableFullscreen(){
+
+    if(window.innerWidth < 700){
+
+        const elem =
+        document.documentElement;
+
+        if(elem.requestFullscreen){
+
+            elem.requestFullscreen();
+
+        }else if(elem.webkitRequestFullscreen){
+
+            elem.webkitRequestFullscreen();
+        }
+    }
+}
 
 /* ROAD LINES */
 
 for(let i=0;i<8;i++){
 
-    let line = document.createElement("div");
+    let line =
+    document.createElement("div");
 
     line.classList.add("line");
 
     line.y = i * 150;
 
-    line.style.top = line.y + "px";
+    line.style.top =
+    line.y + "px";
 
     road.appendChild(line);
 }
 
-/* WATER PATCHES */
+/* WATER */
 
 for(let i=0;i<4;i++){
 
-    let water = document.createElement("div");
+    let water =
+    document.createElement("div");
 
     water.classList.add("water");
 
+    water.y = -(i * 500);
+
     water.style.left =
-    Math.random()*320 + "px";
+    Math.random()*300 + "px";
 
     water.style.top =
-    -(i * 500) + "px";
-
-    water.y = -(i * 500);
+    water.y + "px";
 
     road.appendChild(water);
 }
@@ -354,7 +424,8 @@ function createEnemies(){
 
     for(let i=0;i<enemyCount;i++){
 
-        let enemy = document.createElement("div");
+        let enemy =
+        document.createElement("div");
 
         enemy.classList.add("enemy");
 
@@ -372,40 +443,44 @@ function createEnemies(){
 
         let lane =
         possible[
-            Math.floor(Math.random()*possible.length)
+            Math.floor(
+                Math.random()*possible.length
+            )
         ];
 
         used.push(lane);
 
-        enemy.style.left = lane + "px";
+        enemy.style.left =
+        lane + "px";
 
-        enemy.style.top = -(i * 260) + "px";
+        enemy.style.top =
+        -(i * 260) + "px";
 
-        enemy.dataset.targetLane = lane;
+        enemy.dataset.targetLane =
+        lane;
 
         enemy.dataset.timer = 0;
 
         /* INDICATORS */
 
-        let leftIndicator =
+        let left =
         document.createElement("div");
 
-        leftIndicator.classList.add(
+        left.classList.add(
             "indicator",
             "leftIndicator"
         );
 
-        let rightIndicator =
+        let right =
         document.createElement("div");
 
-        rightIndicator.classList.add(
+        right.classList.add(
             "indicator",
             "rightIndicator"
         );
 
-        enemy.appendChild(leftIndicator);
-
-        enemy.appendChild(rightIndicator);
+        enemy.appendChild(left);
+        enemy.appendChild(right);
 
         road.appendChild(enemy);
 
@@ -413,7 +488,7 @@ function createEnemies(){
     }
 }
 
-/* CHOOSE NEW LANE */
+/* CHOOSE LANE */
 
 function chooseLane(enemy){
 
@@ -422,15 +497,18 @@ function chooseLane(enemy){
 
     let possible =
     lanes.filter(l =>
-        Math.abs(l - current) > 50
+        Math.abs(l-current) > 50
     );
 
     let target =
     possible[
-        Math.floor(Math.random()*possible.length)
+        Math.floor(
+            Math.random()*possible.length
+        )
     ];
 
-    enemy.dataset.targetLane = target;
+    enemy.dataset.targetLane =
+    target;
 
     let direction =
     target > current
@@ -450,26 +528,26 @@ function chooseLane(enemy){
         : "left";
     }
 
-    let left =
+    let leftLight =
     enemy.querySelector(".leftIndicator");
 
-    let right =
+    let rightLight =
     enemy.querySelector(".rightIndicator");
 
-    left.classList.remove("blink");
-    right.classList.remove("blink");
+    leftLight.classList.remove("blink");
+    rightLight.classList.remove("blink");
 
     if(direction === "left"){
 
-        left.classList.add("blink");
+        leftLight.classList.add("blink");
 
     }else{
 
-        right.classList.add("blink");
+        rightLight.classList.add("blink");
     }
 }
 
-/* SHOOT */
+/* BULLETS */
 
 function shootBullet(enemy){
 
@@ -482,7 +560,7 @@ function shootBullet(enemy){
     (enemy.offsetLeft + 25) + "px";
 
     bullet.style.top =
-    (enemy.offsetTop + 100) + "px";
+    (enemy.offsetTop + 80) + "px";
 
     let dir =
     Math.random() < 0.5 ? -1 : 1;
@@ -502,7 +580,7 @@ function shootBullet(enemy){
     bullets.push(bullet);
 }
 
-/* ENEMY SHOOT */
+/* SHOOTING */
 
 setInterval(()=>{
 
@@ -520,9 +598,11 @@ setInterval(()=>{
 
 },1200);
 
-/* SET DIFFICULTY */
+/* DIFFICULTY */
 
 function setDifficulty(level){
+
+    enableFullscreen();
 
     difficulty = level;
 
@@ -550,15 +630,18 @@ function setDifficulty(level){
     startGame();
 }
 
-/* START GAME */
+/* START */
 
 function startGame(){
 
     gameRunning = true;
 
+    setupLanes();
+
     player.score = 0;
 
-    player.x = 160;
+    player.x =
+    (road.offsetWidth/2) - 30;
 
     bike.style.left =
     player.x + "px";
@@ -581,20 +664,25 @@ function startGame(){
     requestAnimationFrame(playGame);
 }
 
-/* MOVE ROAD */
+/* ROAD MOVEMENT */
 
 function moveRoad(){
 
     curve += 0.02;
 
+    let maxCurve =
+    window.innerWidth < 700
+    ? 35
+    : 90;
+
     let roadMove =
-    Math.sin(curve) * 90;
+    Math.sin(curve) * maxCurve;
 
     road.style.left =
     `calc(50% + ${roadMove}px)`;
 
     bike.style.transform =
-    `rotate(${roadMove/14}deg)`;
+    `rotate(${roadMove/18}deg)`;
 }
 
 /* MOVE LINES */
@@ -604,7 +692,8 @@ function moveLines(){
     document.querySelectorAll(".line")
     .forEach(line=>{
 
-        if(line.y >= window.innerHeight){
+        if(line.y >=
+        window.innerHeight){
 
             line.y = -120;
         }
@@ -625,22 +714,25 @@ function moveWater(){
 
         water.y += player.speed;
 
-        if(water.y > window.innerHeight){
+        if(
+            water.y >
+            window.innerHeight
+        ){
 
             water.y = -500;
 
             water.style.left =
-            Math.random()*320 + "px";
+            Math.random()*300 + "px";
         }
 
         water.style.top =
         water.y + "px";
 
-        let waterRect =
-        water.getBoundingClientRect();
-
         let bikeRect =
         bike.getBoundingClientRect();
+
+        let waterRect =
+        water.getBoundingClientRect();
 
         if(
 
@@ -669,7 +761,8 @@ function moveEnemies(){
 
         if(top > window.innerHeight){
 
-            enemy.style.top = "-250px";
+            enemy.style.top =
+            "-250px";
 
             let lane =
             lanes[
@@ -687,7 +780,8 @@ function moveEnemies(){
             player.score++;
 
             scoreBox.innerHTML =
-            "Score : " + player.score;
+            "Score : " +
+            player.score;
 
         }else{
 
@@ -761,8 +855,9 @@ function moveBullets(){
 
         bullet.style.left =
         left +
-        parseInt(bullet.dataset.dir)*2
-        + "px";
+        parseInt(
+            bullet.dataset.dir
+        ) * 2 + "px";
 
         if(top > window.innerHeight){
 
@@ -792,7 +887,7 @@ function moveBullets(){
     });
 }
 
-/* GAME LOOP */
+/* LOOP */
 
 function playGame(){
 
@@ -817,12 +912,19 @@ function playGame(){
 
     moveBullets();
 
-    if(keys.left && player.x > 0){
+    if(
+        keys.left &&
+        player.x > 0
+    ){
 
         player.x -= player.speed;
     }
 
-    if(keys.right && player.x < 340){
+    if(
+        keys.right &&
+        player.x <
+        road.offsetWidth - 70
+    ){
 
         player.x += player.speed;
     }
@@ -868,14 +970,17 @@ function endGame(){
 document.addEventListener("keydown",(e)=>{
 
     if(e.key === "ArrowLeft"){
+
         keys.left = true;
     }
 
     if(e.key === "ArrowRight"){
+
         keys.right = true;
     }
 
     if(e.key === "ArrowDown"){
+
         keys.brake = true;
     }
 
@@ -884,14 +989,17 @@ document.addEventListener("keydown",(e)=>{
 document.addEventListener("keyup",(e)=>{
 
     if(e.key === "ArrowLeft"){
+
         keys.left = false;
     }
 
     if(e.key === "ArrowRight"){
+
         keys.right = false;
     }
 
     if(e.key === "ArrowDown"){
+
         keys.brake = false;
     }
 
@@ -899,27 +1007,45 @@ document.addEventListener("keyup",(e)=>{
 
 /* MOBILE */
 
-leftBtn.addEventListener("touchstart",()=>{
+leftBtn.addEventListener(
+"touchstart",
+()=>{
+
     keys.left = true;
 });
 
-leftBtn.addEventListener("touchend",()=>{
+leftBtn.addEventListener(
+"touchend",
+()=>{
+
     keys.left = false;
 });
 
-rightBtn.addEventListener("touchstart",()=>{
+rightBtn.addEventListener(
+"touchstart",
+()=>{
+
     keys.right = true;
 });
 
-rightBtn.addEventListener("touchend",()=>{
+rightBtn.addEventListener(
+"touchend",
+()=>{
+
     keys.right = false;
 });
 
-brakeBtn.addEventListener("touchstart",()=>{
+brakeBtn.addEventListener(
+"touchstart",
+()=>{
+
     keys.brake = true;
 });
 
-brakeBtn.addEventListener("touchend",()=>{
+brakeBtn.addEventListener(
+"touchend",
+()=>{
+
     keys.brake = false;
 });
 

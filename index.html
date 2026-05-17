@@ -2,13 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width,
+
+<meta
+name="viewport"
+content="
+width=device-width,
 initial-scale=1.0,
 maximum-scale=1.0,
-user-scalable=no">
+user-scalable=no
+">
 
-<title>Ultimate Car Racing</title>
+<title>Ultimate Bike Racing</title>
 
 <style>
 
@@ -19,6 +23,7 @@ user-scalable=no">
 }
 
 html,body{
+
     width:100%;
     height:100%;
     overflow:hidden;
@@ -30,10 +35,12 @@ html,body{
 /* GAME */
 
 #game{
+
     width:100vw;
     height:100vh;
     position:relative;
     overflow:hidden;
+
     background:
     linear-gradient(
         to bottom,
@@ -47,88 +54,137 @@ html,body{
 /* ROAD */
 
 #road{
+
     position:absolute;
-    width:min(100vw,500px);
+
+    width:min(100vw,520px);
+
     height:100%;
+
     left:50%;
+
     transform:translateX(-50%);
+
     background:#333;
+
     overflow:hidden;
+
     border-left:5px solid white;
+
     border-right:5px solid white;
+
     transition:left 0.08s linear;
 }
 
 /* ROAD LINES */
 
 .line{
+
     position:absolute;
+
     width:10px;
+
     height:90px;
+
     background:white;
+
     left:50%;
+
     transform:translateX(-50%);
 }
 
 /* WATER */
 
 .water{
+
     position:absolute;
+
     width:70px;
+
     height:120px;
+
     background:rgba(0,150,255,0.4);
+
     border-radius:50%;
+
     filter:blur(2px);
 }
 
 /* PLAYER */
 
 #bike{
+
     position:absolute;
-    width:55px;
-    height:100px;
+
+    width:58px;
+
+    height:105px;
+
     background:red;
-    border-radius:14px;
-    bottom:80px;
+
+    border-radius:15px;
+
+    bottom:90px;
+
     left:50%;
+
     transform:translateX(-50%);
+
     z-index:10;
+
     box-shadow:0 0 15px rgba(0,0,0,0.5);
 }
 
 /* ENEMIES */
 
 .enemy{
+
     position:absolute;
-    width:55px;
-    height:100px;
+
+    width:58px;
+
+    height:105px;
+
     background:gold;
-    border-radius:14px;
+
+    border-radius:15px;
+
     top:-150px;
+
     box-shadow:0 0 15px rgba(0,0,0,0.5);
 }
 
 /* INDICATORS */
 
 .indicator{
+
     position:absolute;
+
     width:10px;
+
     height:10px;
+
     background:orange;
+
     border-radius:50%;
-    top:40px;
+
+    top:42px;
+
     opacity:0;
 }
 
 .leftIndicator{
+
     left:-6px;
 }
 
 .rightIndicator{
+
     right:-6px;
 }
 
 .blink{
+
     animation:blink 0.4s infinite;
 }
 
@@ -144,95 +200,153 @@ html,body{
 /* BULLETS */
 
 .bullet{
+
     position:absolute;
+
     width:10px;
+
     height:24px;
+
     background:orange;
+
     border-radius:10px;
 }
 
 /* SCORE */
 
 #score{
+
     position:absolute;
+
     top:15px;
+
     left:15px;
+
     color:white;
+
     font-size:26px;
+
     z-index:100;
+
     text-shadow:2px 2px 5px black;
 }
 
-/* START */
+/* START SCREEN */
 
 #start{
+
     position:absolute;
+
     width:100%;
+
     height:100%;
+
     background:rgba(0,0,0,0.88);
+
     z-index:200;
+
     display:flex;
+
     justify-content:center;
+
     align-items:center;
+
     flex-direction:column;
+
     text-align:center;
+
     color:white;
+
     padding:20px;
 }
 
 .levelBtn{
+
     width:220px;
+
     padding:18px;
+
     margin:10px;
+
     font-size:24px;
+
     border:none;
+
     border-radius:12px;
+
     cursor:pointer;
+
     font-weight:bold;
 }
 
 /* CONTROLS */
 
 #controls{
+
     position:absolute;
+
     width:100%;
+
     bottom:12px;
+
     display:flex;
+
     justify-content:space-between;
+
     padding:0 12px;
+
     z-index:100;
 }
 
 .btn{
+
     width:75px;
+
     height:75px;
+
     border-radius:50%;
+
     background:rgba(255,255,255,0.25);
+
     color:white;
+
     display:flex;
+
     justify-content:center;
+
     align-items:center;
+
     font-size:34px;
+
     backdrop-filter:blur(5px);
+
     user-select:none;
 }
 
-@media(min-width:700px){
+/* MOBILE */
 
-    #road{
-        width:500px;
-    }
-
-    .btn{
-        width:85px;
-        height:85px;
-        font-size:40px;
-    }
+@media(max-width:700px){
 
     #bike,
     .enemy{
-        width:60px;
-        height:110px;
+
+        width:52px;
+
+        height:95px;
+    }
+
+    .btn{
+
+        width:70px;
+
+        height:70px;
+
+        font-size:32px;
+    }
+
+    #score{
+
+        font-size:22px;
     }
 }
 
@@ -242,11 +356,15 @@ html,body{
 
 <div id="game">
 
-    <div id="score">Score : 0</div>
+    <div id="score">
+        Score : 0
+    </div>
 
     <div id="start">
 
-        <h1>🏍 ULTIMATE CAR RACING</h1>
+        <h1>
+            🏍 ULTIMATE BIKE RACING
+        </h1>
 
         <br>
 
@@ -254,19 +372,22 @@ html,body{
 
         <br><br>
 
-        <button class="levelBtn"
+        <button
+        class="levelBtn"
         onclick="setDifficulty('easy')">
-        EASY
+            EASY
         </button>
 
-        <button class="levelBtn"
+        <button
+        class="levelBtn"
         onclick="setDifficulty('medium')">
-        MEDIUM
+            MEDIUM
         </button>
 
-        <button class="levelBtn"
+        <button
+        class="levelBtn"
         onclick="setDifficulty('hard')">
-        HARD
+            HARD
         </button>
 
         <br><br>
@@ -284,11 +405,23 @@ html,body{
 
     <div id="controls">
 
-        <div class="btn" id="leftBtn">◀</div>
+        <div
+        class="btn"
+        id="leftBtn">
+            ◀
+        </div>
 
-        <div class="btn" id="brakeBtn">⬇</div>
+        <div
+        class="btn"
+        id="brakeBtn">
+            ⬇
+        </div>
 
-        <div class="btn" id="rightBtn">▶</div>
+        <div
+        class="btn"
+        id="rightBtn">
+            ▶
+        </div>
 
     </div>
 
@@ -296,22 +429,36 @@ html,body{
 
 <script>
 
-const road = document.getElementById("road");
-const bike = document.getElementById("bike");
-const scoreBox = document.getElementById("score");
-const startScreen = document.getElementById("start");
+const road =
+document.getElementById("road");
 
-const leftBtn = document.getElementById("leftBtn");
-const rightBtn = document.getElementById("rightBtn");
-const brakeBtn = document.getElementById("brakeBtn");
+const bike =
+document.getElementById("bike");
+
+const scoreBox =
+document.getElementById("score");
+
+const startScreen =
+document.getElementById("start");
+
+const leftBtn =
+document.getElementById("leftBtn");
+
+const rightBtn =
+document.getElementById("rightBtn");
+
+const brakeBtn =
+document.getElementById("brakeBtn");
 
 let keys = {
+
     left:false,
     right:false,
     brake:false
 };
 
 let player = {
+
     x:0,
     speed:8,
     score:0
@@ -326,34 +473,12 @@ let animationId;
 let difficulty = "easy";
 
 let enemyCount = 4;
-let bulletSpeed = 8;
 let gameSpeed = 6;
+let bulletSpeed = 8;
 
 let lanes = [];
 
 let curve = 0;
-
-/* RESPONSIVE LANES */
-
-function setupLanes(){
-
-    const roadWidth =
-    road.offsetWidth;
-
-    const laneCount = 4;
-
-    const spacing =
-    (roadWidth - 80) / laneCount;
-
-    lanes = [];
-
-    for(let i=0;i<laneCount;i++){
-
-        lanes.push(
-            15 + (i * spacing)
-        );
-    }
-}
 
 /* FULLSCREEN */
 
@@ -368,10 +493,46 @@ function enableFullscreen(){
 
             elem.requestFullscreen();
 
-        }else if(elem.webkitRequestFullscreen){
+        }else if(
+            elem.webkitRequestFullscreen
+        ){
 
             elem.webkitRequestFullscreen();
         }
+    }
+}
+
+/* SETUP LANES */
+
+function setupLanes(){
+
+    const roadWidth =
+    road.offsetWidth;
+
+    const enemyWidth =
+    bike.offsetWidth;
+
+    const sidePadding = 25;
+
+    const usableWidth =
+    roadWidth -
+    (sidePadding * 2) -
+    enemyWidth;
+
+    const laneCount = 4;
+
+    lanes = [];
+
+    for(let i=0;i<laneCount;i++){
+
+        let lane =
+        sidePadding +
+        (
+            usableWidth /
+            (laneCount - 1)
+        ) * i;
+
+        lanes.push(lane);
     }
 }
 
@@ -420,8 +581,6 @@ function createEnemies(){
 
     enemies = [];
 
-    let used = [];
-
     for(let i=0;i<enemyCount;i++){
 
         let enemy =
@@ -429,26 +588,10 @@ function createEnemies(){
 
         enemy.classList.add("enemy");
 
-        let possible =
-        lanes.filter(l =>
-            !used.includes(l)
-        );
-
-        if(possible.length === 0){
-
-            used = [];
-
-            possible = lanes;
-        }
-
         let lane =
-        possible[
-            Math.floor(
-                Math.random()*possible.length
-            )
+        lanes[
+            i % lanes.length
         ];
-
-        used.push(lane);
 
         enemy.style.left =
         lane + "px";
@@ -493,11 +636,11 @@ function createEnemies(){
 function chooseLane(enemy){
 
     let current =
-    parseInt(enemy.style.left);
+    parseFloat(enemy.style.left);
 
     let possible =
     lanes.filter(l =>
-        Math.abs(l-current) > 50
+        Math.abs(l-current) > 40
     );
 
     let target =
@@ -535,6 +678,7 @@ function chooseLane(enemy){
     enemy.querySelector(".rightIndicator");
 
     leftLight.classList.remove("blink");
+
     rightLight.classList.remove("blink");
 
     if(direction === "left"){
@@ -547,7 +691,7 @@ function chooseLane(enemy){
     }
 }
 
-/* BULLETS */
+/* SHOOT */
 
 function shootBullet(enemy){
 
@@ -557,13 +701,15 @@ function shootBullet(enemy){
     bullet.classList.add("bullet");
 
     bullet.style.left =
-    (enemy.offsetLeft + 25) + "px";
+    (enemy.offsetLeft + 24) + "px";
 
     bullet.style.top =
     (enemy.offsetTop + 80) + "px";
 
     let dir =
-    Math.random() < 0.5 ? -1 : 1;
+    Math.random() < 0.5
+    ? -1
+    : 1;
 
     if(
         difficulty !== "easy" &&
@@ -580,20 +726,20 @@ function shootBullet(enemy){
     bullets.push(bullet);
 }
 
-/* SHOOTING */
+/* ENEMY SHOOT */
 
 setInterval(()=>{
 
     if(gameRunning){
 
-        let randomEnemy =
+        let enemy =
         enemies[
             Math.floor(
                 Math.random()*enemies.length
             )
         ];
 
-        shootBullet(randomEnemy);
+        shootBullet(enemy);
     }
 
 },1200);
@@ -641,7 +787,8 @@ function startGame(){
     player.score = 0;
 
     player.x =
-    (road.offsetWidth/2) - 30;
+    (road.offsetWidth / 2) -
+    (bike.offsetWidth / 2);
 
     bike.style.left =
     player.x + "px";
@@ -654,14 +801,20 @@ function startGame(){
 
     createEnemies();
 
-    bullets.forEach(b => b.remove());
+    bullets.forEach(
+        b => b.remove()
+    );
 
     bullets = [];
 
-    cancelAnimationFrame(animationId);
+    cancelAnimationFrame(
+        animationId
+    );
 
     animationId =
-    requestAnimationFrame(playGame);
+    requestAnimationFrame(
+        playGame
+    );
 }
 
 /* ROAD MOVEMENT */
@@ -689,11 +842,14 @@ function moveRoad(){
 
 function moveLines(){
 
-    document.querySelectorAll(".line")
+    document
+    .querySelectorAll(".line")
     .forEach(line=>{
 
-        if(line.y >=
-        window.innerHeight){
+        if(
+            line.y >=
+            window.innerHeight
+        ){
 
             line.y = -120;
         }
@@ -709,7 +865,8 @@ function moveLines(){
 
 function moveWater(){
 
-    document.querySelectorAll(".water")
+    document
+    .querySelectorAll(".water")
     .forEach(water=>{
 
         water.y += player.speed;
@@ -757,7 +914,7 @@ function moveEnemies(){
     enemies.forEach(enemy=>{
 
         let top =
-        parseInt(enemy.style.top);
+        parseFloat(enemy.style.top);
 
         if(top > window.innerHeight){
 
@@ -799,10 +956,12 @@ function moveEnemies(){
         }
 
         let current =
-        parseInt(enemy.style.left);
+        parseFloat(enemy.style.left);
 
         let target =
-        parseInt(enemy.dataset.targetLane);
+        parseFloat(
+            enemy.dataset.targetLane
+        );
 
         if(current < target){
 
@@ -845,10 +1004,10 @@ function moveBullets(){
     bullets.forEach((bullet,index)=>{
 
         let top =
-        parseInt(bullet.style.top);
+        parseFloat(bullet.style.top);
 
         let left =
-        parseInt(bullet.style.left);
+        parseFloat(bullet.style.left);
 
         bullet.style.top =
         top + bulletSpeed + "px";
@@ -887,7 +1046,7 @@ function moveBullets(){
     });
 }
 
-/* LOOP */
+/* GAME LOOP */
 
 function playGame(){
 
@@ -914,7 +1073,7 @@ function playGame(){
 
     if(
         keys.left &&
-        player.x > 0
+        player.x > 5
     ){
 
         player.x -= player.speed;
@@ -923,7 +1082,8 @@ function playGame(){
     if(
         keys.right &&
         player.x <
-        road.offsetWidth - 70
+        road.offsetWidth -
+        bike.offsetWidth - 10
     ){
 
         player.x += player.speed;
@@ -933,16 +1093,20 @@ function playGame(){
     player.x + "px";
 
     animationId =
-    requestAnimationFrame(playGame);
+    requestAnimationFrame(
+        playGame
+    );
 }
 
-/* END */
+/* END GAME */
 
 function endGame(){
 
     gameRunning = false;
 
-    cancelAnimationFrame(animationId);
+    cancelAnimationFrame(
+        animationId
+    );
 
     startScreen.style.display =
     "flex";
@@ -958,16 +1122,19 @@ function endGame(){
 
     <br><br>
 
-    <button class="levelBtn"
+    <button
+    class="levelBtn"
     onclick="location.reload()">
-    PLAY AGAIN
+        PLAY AGAIN
     </button>
     `;
 }
 
 /* KEYBOARD */
 
-document.addEventListener("keydown",(e)=>{
+document.addEventListener(
+"keydown",
+(e)=>{
 
     if(e.key === "ArrowLeft"){
 
@@ -986,7 +1153,9 @@ document.addEventListener("keydown",(e)=>{
 
 });
 
-document.addEventListener("keyup",(e)=>{
+document.addEventListener(
+"keyup",
+(e)=>{
 
     if(e.key === "ArrowLeft"){
 

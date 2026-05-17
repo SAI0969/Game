@@ -51,6 +51,37 @@ html,body{
     );
 }
 
+/* FULLSCREEN BUTTON */
+
+#fullscreenBtn{
+
+    position:absolute;
+
+    top:12px;
+
+    right:12px;
+
+    z-index:500;
+
+    padding:12px 18px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:black;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    opacity:0.85;
+}
+
 /* ROAD */
 
 #road{
@@ -321,6 +352,12 @@ html,body{
     backdrop-filter:blur(5px);
 
     user-select:none;
+
+    -webkit-user-select:none;
+
+    -webkit-touch-callout:none;
+
+    touch-action:none;
 }
 
 /* MOBILE */
@@ -348,13 +385,25 @@ html,body{
 
         font-size:22px;
     }
+
+    #fullscreenBtn{
+
+        font-size:14px;
+
+        padding:10px 14px;
+    }
 }
 
 </style>
 </head>
-<body>
+
+<body oncontextmenu="return false">
 
 <div id="game">
+
+    <button id="fullscreenBtn">
+        ⛶ FULLSCREEN
+    </button>
 
     <div id="score">
         Score : 0
@@ -405,21 +454,15 @@ html,body{
 
     <div id="controls">
 
-        <div
-        class="btn"
-        id="leftBtn">
+        <div class="btn" id="leftBtn">
             ◀
         </div>
 
-        <div
-        class="btn"
-        id="brakeBtn">
+        <div class="btn" id="brakeBtn">
             ⬇
         </div>
 
-        <div
-        class="btn"
-        id="rightBtn">
+        <div class="btn" id="rightBtn">
             ▶
         </div>
 
@@ -440,6 +483,9 @@ document.getElementById("score");
 
 const startScreen =
 document.getElementById("start");
+
+const fullscreenBtn =
+document.getElementById("fullscreenBtn");
 
 const leftBtn =
 document.getElementById("leftBtn");
@@ -468,12 +514,15 @@ let enemies = [];
 let bullets = [];
 
 let gameRunning = false;
+
 let animationId;
 
 let difficulty = "easy";
 
 let enemyCount = 4;
+
 let gameSpeed = 6;
+
 let bulletSpeed = 8;
 
 let lanes = [];
@@ -484,23 +533,25 @@ let curve = 0;
 
 function enableFullscreen(){
 
-    if(window.innerWidth < 700){
+    const elem =
+    document.documentElement;
 
-        const elem =
-        document.documentElement;
+    if(elem.requestFullscreen){
 
-        if(elem.requestFullscreen){
+        elem.requestFullscreen();
 
-            elem.requestFullscreen();
+    }else if(
+        elem.webkitRequestFullscreen
+    ){
 
-        }else if(
-            elem.webkitRequestFullscreen
-        ){
-
-            elem.webkitRequestFullscreen();
-        }
+        elem.webkitRequestFullscreen();
     }
 }
+
+fullscreenBtn.addEventListener(
+"click",
+enableFullscreen
+);
 
 /* SETUP LANES */
 
@@ -577,7 +628,9 @@ for(let i=0;i<4;i++){
 
 function createEnemies(){
 
-    enemies.forEach(e => e.remove());
+    enemies.forEach(
+        e => e.remove()
+    );
 
     enemies = [];
 
@@ -623,6 +676,7 @@ function createEnemies(){
         );
 
         enemy.appendChild(left);
+
         enemy.appendChild(right);
 
         road.appendChild(enemy);
@@ -658,8 +712,6 @@ function chooseLane(enemy){
     ? "right"
     : "left";
 
-    /* BLUFF */
-
     if(
         difficulty !== "easy" &&
         Math.random() < 0.45
@@ -691,7 +743,7 @@ function chooseLane(enemy){
     }
 }
 
-/* SHOOT */
+/* BULLETS */
 
 function shootBullet(enemy){
 
@@ -747,8 +799,6 @@ setInterval(()=>{
 /* DIFFICULTY */
 
 function setDifficulty(level){
-
-    enableFullscreen();
 
     difficulty = level;
 
@@ -884,26 +934,6 @@ function moveWater(){
 
         water.style.top =
         water.y + "px";
-
-        let bikeRect =
-        bike.getBoundingClientRect();
-
-        let waterRect =
-        water.getBoundingClientRect();
-
-        if(
-
-            bikeRect.left < waterRect.right &&
-            bikeRect.right > waterRect.left &&
-            bikeRect.top < waterRect.bottom &&
-            bikeRect.bottom > waterRect.top
-
-        ){
-
-            player.x +=
-            Math.sin(curve)*2;
-        }
-
     });
 }
 
@@ -1098,7 +1128,7 @@ function playGame(){
     );
 }
 
-/* END GAME */
+/* END */
 
 function endGame(){
 
@@ -1174,49 +1204,109 @@ document.addEventListener(
 
 });
 
-/* MOBILE */
+/* MOBILE CONTROLS */
 
-leftBtn.addEventListener(
-"touchstart",
-()=>{
+function pressLeft(e){
+
+    e.preventDefault();
 
     keys.left = true;
-});
+}
+
+function releaseLeft(e){
+
+    e.preventDefault();
+
+    keys.left = false;
+}
+
+function pressRight(e){
+
+    e.preventDefault();
+
+    keys.right = true;
+}
+
+function releaseRight(e){
+
+    e.preventDefault();
+
+    keys.right = false;
+}
+
+function pressBrake(e){
+
+    e.preventDefault();
+
+    keys.brake = true;
+}
+
+function releaseBrake(e){
+
+    e.preventDefault();
+
+    keys.brake = false;
+}
+
+/* LEFT */
+
+leftBtn.addEventListener(
+"touchstart",
+pressLeft,
+{passive:false}
+);
 
 leftBtn.addEventListener(
 "touchend",
-()=>{
+releaseLeft,
+{passive:false}
+);
 
-    keys.left = false;
-});
+leftBtn.addEventListener(
+"touchcancel",
+releaseLeft,
+{passive:false}
+);
+
+/* RIGHT */
 
 rightBtn.addEventListener(
 "touchstart",
-()=>{
-
-    keys.right = true;
-});
+pressRight,
+{passive:false}
+);
 
 rightBtn.addEventListener(
 "touchend",
-()=>{
+releaseRight,
+{passive:false}
+);
 
-    keys.right = false;
-});
+rightBtn.addEventListener(
+"touchcancel",
+releaseRight,
+{passive:false}
+);
+
+/* BRAKE */
 
 brakeBtn.addEventListener(
 "touchstart",
-()=>{
-
-    keys.brake = true;
-});
+pressBrake,
+{passive:false}
+);
 
 brakeBtn.addEventListener(
 "touchend",
-()=>{
+releaseBrake,
+{passive:false}
+);
 
-    keys.brake = false;
-});
+brakeBtn.addEventListener(
+"touchcancel",
+releaseBrake,
+{passive:false}
+);
 
 </script>
 

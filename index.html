@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bike Racing Game</title>
+
+<title>Realistic Bike Racing</title>
 
 <style>
 
@@ -30,8 +31,8 @@ body{
         to bottom,
         #87CEEB 0%,
         #87CEEB 45%,
-        #4CAF50 45%,
-        #4CAF50 100%
+        #3e9d3e 45%,
+        #3e9d3e 100%
     );
 }
 
@@ -48,7 +49,18 @@ body{
     overflow:hidden;
     border-left:8px solid white;
     border-right:8px solid white;
-    transition:left 0.1s linear;
+    transition:left 0.08s linear;
+}
+
+/* ROAD WATER */
+
+.water{
+    position:absolute;
+    width:70px;
+    height:120px;
+    background:rgba(0,150,255,0.4);
+    border-radius:50%;
+    filter:blur(2px);
 }
 
 /* ROAD LINES */
@@ -69,22 +81,56 @@ body{
     width:60px;
     height:110px;
     background:red;
-    border-radius:15px;
+    border-radius:16px;
     bottom:40px;
-    left:150px;
-    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    left:160px;
+    transition:transform 0.1s;
+    box-shadow:0 0 15px rgba(0,0,0,0.5);
 }
 
-/* ENEMY CARS */
+/* ENEMY */
 
 .enemy{
     position:absolute;
     width:60px;
     height:110px;
-    background:yellow;
-    border-radius:15px;
+    background:gold;
+    border-radius:16px;
     top:-150px;
     box-shadow:0 0 15px rgba(0,0,0,0.5);
+}
+
+/* INDICATORS */
+
+.indicator{
+    position:absolute;
+    width:10px;
+    height:10px;
+    background:orange;
+    border-radius:50%;
+    top:45px;
+    opacity:0;
+}
+
+.leftIndicator{
+    left:-6px;
+}
+
+.rightIndicator{
+    right:-6px;
+}
+
+.blink{
+    animation:blink 0.4s infinite;
+}
+
+@keyframes blink{
+
+    0%{opacity:0;}
+
+    50%{opacity:1;}
+
+    100%{opacity:0;}
 }
 
 /* BULLETS */
@@ -105,7 +151,7 @@ body{
     left:20px;
     color:white;
     font-size:28px;
-    z-index:20;
+    z-index:50;
     text-shadow:2px 2px 5px black;
 }
 
@@ -115,42 +161,32 @@ body{
     position:absolute;
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.8);
+    background:rgba(0,0,0,0.85);
     z-index:100;
-    color:white;
     display:flex;
     justify-content:center;
     align-items:center;
     flex-direction:column;
+    color:white;
     text-align:center;
-    font-size:28px;
+    font-size:26px;
     padding:20px;
 }
 
-/* LEVEL BUTTONS */
+/* BUTTONS */
 
 .levelBtn{
-
     width:220px;
-
     padding:18px;
-
     margin:10px;
-
-    font-size:24px;
-
     border:none;
-
     border-radius:12px;
-
-    background:white;
-
-    cursor:pointer;
-
+    font-size:24px;
     font-weight:bold;
+    cursor:pointer;
 }
 
-/* MOBILE BUTTONS */
+/* MOBILE */
 
 #controls{
     position:absolute;
@@ -167,13 +203,13 @@ body{
     height:85px;
     border-radius:50%;
     background:rgba(255,255,255,0.3);
+    backdrop-filter:blur(5px);
     color:white;
-    font-size:38px;
+    font-size:40px;
     display:flex;
     justify-content:center;
     align-items:center;
     user-select:none;
-    backdrop-filter:blur(5px);
 }
 
 </style>
@@ -186,27 +222,27 @@ body{
 
     <div id="start">
 
-        <h1>🏍 BIKE RACING</h1>
+        <h1>🏍 REALISTIC BIKE RACING</h1>
 
         <br>
 
-        SELECT LEVEL
+        SELECT DIFFICULTY
 
         <br><br>
 
         <button class="levelBtn"
         onclick="setDifficulty('easy')">
-            EASY
+        EASY
         </button>
 
         <button class="levelBtn"
         onclick="setDifficulty('medium')">
-            MEDIUM
+        MEDIUM
         </button>
 
         <button class="levelBtn"
         onclick="setDifficulty('hard')">
-            HARD
+        HARD
         </button>
 
         <br><br>
@@ -252,7 +288,7 @@ let keys = {
 };
 
 let player = {
-    x:150,
+    x:160,
     speed:8,
     score:0
 };
@@ -262,11 +298,15 @@ let bullets = [];
 
 let gameRunning = false;
 let animationId;
-let curve = 0;
 
 let enemyCount = 5;
-let bulletSpeed = 12;
 let gameSpeed = 8;
+let bulletSpeed = 10;
+let difficulty = "easy";
+
+let curve = 0;
+
+const lanes = [20,110,200,290];
 
 /* ROAD LINES */
 
@@ -283,13 +323,34 @@ for(let i=0;i<8;i++){
     road.appendChild(line);
 }
 
+/* WATER PATCHES */
+
+for(let i=0;i<4;i++){
+
+    let water = document.createElement("div");
+
+    water.classList.add("water");
+
+    water.style.left =
+    Math.random()*320 + "px";
+
+    water.style.top =
+    -(i * 500) + "px";
+
+    water.y = -(i * 500);
+
+    road.appendChild(water);
+}
+
 /* CREATE ENEMIES */
 
 function createEnemies(){
 
-    enemies.forEach(enemy => enemy.remove());
+    enemies.forEach(e => e.remove());
 
     enemies = [];
+
+    let used = [];
 
     for(let i=0;i<enemyCount;i++){
 
@@ -297,10 +358,54 @@ function createEnemies(){
 
         enemy.classList.add("enemy");
 
-        enemy.style.left =
-        Math.floor(Math.random()*280) + "px";
+        let possible =
+        lanes.filter(l =>
+            !used.includes(l)
+        );
 
-        enemy.style.top = -(i * 300) + "px";
+        if(possible.length === 0){
+
+            used = [];
+
+            possible = lanes;
+        }
+
+        let lane =
+        possible[
+            Math.floor(Math.random()*possible.length)
+        ];
+
+        used.push(lane);
+
+        enemy.style.left = lane + "px";
+
+        enemy.style.top = -(i * 260) + "px";
+
+        enemy.dataset.targetLane = lane;
+
+        enemy.dataset.timer = 0;
+
+        /* INDICATORS */
+
+        let leftIndicator =
+        document.createElement("div");
+
+        leftIndicator.classList.add(
+            "indicator",
+            "leftIndicator"
+        );
+
+        let rightIndicator =
+        document.createElement("div");
+
+        rightIndicator.classList.add(
+            "indicator",
+            "rightIndicator"
+        );
+
+        enemy.appendChild(leftIndicator);
+
+        enemy.appendChild(rightIndicator);
 
         road.appendChild(enemy);
 
@@ -308,11 +413,68 @@ function createEnemies(){
     }
 }
 
-/* SHOOT BULLET */
+/* CHOOSE NEW LANE */
+
+function chooseLane(enemy){
+
+    let current =
+    parseInt(enemy.style.left);
+
+    let possible =
+    lanes.filter(l =>
+        Math.abs(l - current) > 50
+    );
+
+    let target =
+    possible[
+        Math.floor(Math.random()*possible.length)
+    ];
+
+    enemy.dataset.targetLane = target;
+
+    let direction =
+    target > current
+    ? "right"
+    : "left";
+
+    /* BLUFF */
+
+    if(
+        difficulty !== "easy" &&
+        Math.random() < 0.45
+    ){
+
+        direction =
+        direction === "left"
+        ? "right"
+        : "left";
+    }
+
+    let left =
+    enemy.querySelector(".leftIndicator");
+
+    let right =
+    enemy.querySelector(".rightIndicator");
+
+    left.classList.remove("blink");
+    right.classList.remove("blink");
+
+    if(direction === "left"){
+
+        left.classList.add("blink");
+
+    }else{
+
+        right.classList.add("blink");
+    }
+}
+
+/* SHOOT */
 
 function shootBullet(enemy){
 
-    let bullet = document.createElement("div");
+    let bullet =
+    document.createElement("div");
 
     bullet.classList.add("bullet");
 
@@ -322,30 +484,47 @@ function shootBullet(enemy){
     bullet.style.top =
     (enemy.offsetTop + 100) + "px";
 
+    let dir =
+    Math.random() < 0.5 ? -1 : 1;
+
+    if(
+        difficulty !== "easy" &&
+        Math.random() < 0.5
+    ){
+
+        dir *= -1;
+    }
+
+    bullet.dataset.dir = dir;
+
     road.appendChild(bullet);
 
     bullets.push(bullet);
 }
 
-/* ENEMY SHOOTING */
+/* ENEMY SHOOT */
 
 setInterval(()=>{
 
     if(gameRunning){
 
         let randomEnemy =
-        enemies[Math.floor(
-            Math.random()*enemies.length
-        )];
+        enemies[
+            Math.floor(
+                Math.random()*enemies.length
+            )
+        ];
 
         shootBullet(randomEnemy);
     }
 
 },1200);
 
-/* DIFFICULTY */
+/* SET DIFFICULTY */
 
 function setDifficulty(level){
+
+    difficulty = level;
 
     if(level === "easy"){
 
@@ -363,12 +542,325 @@ function setDifficulty(level){
 
     if(level === "hard"){
 
-        enemyCount = 9;
+        enemyCount = 8;
         gameSpeed = 11;
         bulletSpeed = 18;
     }
 
     startGame();
+}
+
+/* START GAME */
+
+function startGame(){
+
+    gameRunning = true;
+
+    player.score = 0;
+
+    player.x = 160;
+
+    bike.style.left =
+    player.x + "px";
+
+    scoreBox.innerHTML =
+    "Score : 0";
+
+    startScreen.style.display =
+    "none";
+
+    createEnemies();
+
+    bullets.forEach(b => b.remove());
+
+    bullets = [];
+
+    cancelAnimationFrame(animationId);
+
+    animationId =
+    requestAnimationFrame(playGame);
+}
+
+/* MOVE ROAD */
+
+function moveRoad(){
+
+    curve += 0.02;
+
+    let roadMove =
+    Math.sin(curve) * 90;
+
+    road.style.left =
+    `calc(50% + ${roadMove}px)`;
+
+    bike.style.transform =
+    `rotate(${roadMove/14}deg)`;
+}
+
+/* MOVE LINES */
+
+function moveLines(){
+
+    document.querySelectorAll(".line")
+    .forEach(line=>{
+
+        if(line.y >= window.innerHeight){
+
+            line.y = -120;
+        }
+
+        line.y += player.speed;
+
+        line.style.top =
+        line.y + "px";
+    });
+}
+
+/* MOVE WATER */
+
+function moveWater(){
+
+    document.querySelectorAll(".water")
+    .forEach(water=>{
+
+        water.y += player.speed;
+
+        if(water.y > window.innerHeight){
+
+            water.y = -500;
+
+            water.style.left =
+            Math.random()*320 + "px";
+        }
+
+        water.style.top =
+        water.y + "px";
+
+        let waterRect =
+        water.getBoundingClientRect();
+
+        let bikeRect =
+        bike.getBoundingClientRect();
+
+        if(
+
+            bikeRect.left < waterRect.right &&
+            bikeRect.right > waterRect.left &&
+            bikeRect.top < waterRect.bottom &&
+            bikeRect.bottom > waterRect.top
+
+        ){
+
+            player.x +=
+            Math.sin(curve)*2;
+        }
+
+    });
+}
+
+/* MOVE ENEMIES */
+
+function moveEnemies(){
+
+    enemies.forEach(enemy=>{
+
+        let top =
+        parseInt(enemy.style.top);
+
+        if(top > window.innerHeight){
+
+            enemy.style.top = "-250px";
+
+            let lane =
+            lanes[
+                Math.floor(
+                    Math.random()*lanes.length
+                )
+            ];
+
+            enemy.style.left =
+            lane + "px";
+
+            enemy.dataset.targetLane =
+            lane;
+
+            player.score++;
+
+            scoreBox.innerHTML =
+            "Score : " + player.score;
+
+        }else{
+
+            enemy.style.top =
+            top + player.speed + "px";
+        }
+
+        enemy.dataset.timer++;
+
+        if(enemy.dataset.timer > 90){
+
+            chooseLane(enemy);
+
+            enemy.dataset.timer = 0;
+        }
+
+        let current =
+        parseInt(enemy.style.left);
+
+        let target =
+        parseInt(enemy.dataset.targetLane);
+
+        if(current < target){
+
+            current += 2;
+        }
+
+        if(current > target){
+
+            current -= 2;
+        }
+
+        enemy.style.left =
+        current + "px";
+
+        let bikeRect =
+        bike.getBoundingClientRect();
+
+        let enemyRect =
+        enemy.getBoundingClientRect();
+
+        if(
+
+            bikeRect.left < enemyRect.right &&
+            bikeRect.right > enemyRect.left &&
+            bikeRect.top < enemyRect.bottom &&
+            bikeRect.bottom > enemyRect.top
+
+        ){
+
+            endGame();
+        }
+
+    });
+}
+
+/* MOVE BULLETS */
+
+function moveBullets(){
+
+    bullets.forEach((bullet,index)=>{
+
+        let top =
+        parseInt(bullet.style.top);
+
+        let left =
+        parseInt(bullet.style.left);
+
+        bullet.style.top =
+        top + bulletSpeed + "px";
+
+        bullet.style.left =
+        left +
+        parseInt(bullet.dataset.dir)*2
+        + "px";
+
+        if(top > window.innerHeight){
+
+            bullet.remove();
+
+            bullets.splice(index,1);
+        }
+
+        let bikeRect =
+        bike.getBoundingClientRect();
+
+        let bulletRect =
+        bullet.getBoundingClientRect();
+
+        if(
+
+            bikeRect.left < bulletRect.right &&
+            bikeRect.right > bulletRect.left &&
+            bikeRect.top < bulletRect.bottom &&
+            bikeRect.bottom > bulletRect.top
+
+        ){
+
+            endGame();
+        }
+
+    });
+}
+
+/* GAME LOOP */
+
+function playGame(){
+
+    if(!gameRunning) return;
+
+    if(keys.brake){
+
+        player.speed = 3;
+
+    }else{
+
+        player.speed = gameSpeed;
+    }
+
+    moveRoad();
+
+    moveLines();
+
+    moveWater();
+
+    moveEnemies();
+
+    moveBullets();
+
+    if(keys.left && player.x > 0){
+
+        player.x -= player.speed;
+    }
+
+    if(keys.right && player.x < 340){
+
+        player.x += player.speed;
+    }
+
+    bike.style.left =
+    player.x + "px";
+
+    animationId =
+    requestAnimationFrame(playGame);
+}
+
+/* END */
+
+function endGame(){
+
+    gameRunning = false;
+
+    cancelAnimationFrame(animationId);
+
+    startScreen.style.display =
+    "flex";
+
+    startScreen.innerHTML =
+
+    `
+    <h1>💥 GAME OVER</h1>
+
+    <br>
+
+    SCORE : ${player.score}
+
+    <br><br>
+
+    <button class="levelBtn"
+    onclick="location.reload()">
+    PLAY AGAIN
+    </button>
+    `;
 }
 
 /* KEYBOARD */
@@ -430,228 +922,6 @@ brakeBtn.addEventListener("touchstart",()=>{
 brakeBtn.addEventListener("touchend",()=>{
     keys.brake = false;
 });
-
-/* START GAME */
-
-function startGame(){
-
-    gameRunning = true;
-
-    player.score = 0;
-
-    player.x = 150;
-
-    curve = 0;
-
-    bike.style.left = player.x + "px";
-
-    scoreBox.innerHTML = "Score : 0";
-
-    startScreen.style.display = "none";
-
-    createEnemies();
-
-    bullets.forEach(b => b.remove());
-
-    bullets = [];
-
-    cancelAnimationFrame(animationId);
-
-    animationId =
-    requestAnimationFrame(playGame);
-}
-
-/* MOVE ROAD */
-
-function moveRoad(){
-
-    curve += 0.02;
-
-    let roadMove =
-    Math.sin(curve) * 100;
-
-    road.style.left =
-    `calc(50% + ${roadMove}px)`;
-
-    bike.style.transform =
-    `rotate(${roadMove/15}deg)`;
-}
-
-/* MOVE ROAD LINES */
-
-function moveLines(){
-
-    document.querySelectorAll(".line")
-    .forEach((line)=>{
-
-        if(line.y >= window.innerHeight){
-
-            line.y = -120;
-        }
-
-        line.y += player.speed;
-
-        line.style.top =
-        line.y + "px";
-    });
-}
-
-/* MOVE ENEMIES */
-
-function moveEnemies(){
-
-    enemies.forEach((enemy)=>{
-
-        let top =
-        parseInt(enemy.style.top);
-
-        if(top > window.innerHeight){
-
-            enemy.style.top = "-200px";
-
-            enemy.style.left =
-            Math.floor(Math.random()*280)
-            + "px";
-
-            player.score++;
-
-            scoreBox.innerHTML =
-            "Score : " + player.score;
-
-        }else{
-
-            enemy.style.top =
-            top + player.speed + "px";
-        }
-
-        let bikeRect =
-        bike.getBoundingClientRect();
-
-        let enemyRect =
-        enemy.getBoundingClientRect();
-
-        if(
-
-            bikeRect.left < enemyRect.right &&
-            bikeRect.right > enemyRect.left &&
-            bikeRect.top < enemyRect.bottom &&
-            bikeRect.bottom > enemyRect.top
-
-        ){
-
-            endGame();
-        }
-
-    });
-}
-
-/* MOVE BULLETS */
-
-function moveBullets(){
-
-    bullets.forEach((bullet,index)=>{
-
-        let top =
-        parseInt(bullet.style.top);
-
-        bullet.style.top =
-        top + bulletSpeed + "px";
-
-        if(top > window.innerHeight){
-
-            bullet.remove();
-
-            bullets.splice(index,1);
-        }
-
-        let bikeRect =
-        bike.getBoundingClientRect();
-
-        let bulletRect =
-        bullet.getBoundingClientRect();
-
-        if(
-
-            bikeRect.left < bulletRect.right &&
-            bikeRect.right > bulletRect.left &&
-            bikeRect.top < bulletRect.bottom &&
-            bikeRect.bottom > bulletRect.top
-
-        ){
-
-            endGame();
-        }
-
-    });
-}
-
-/* GAME LOOP */
-
-function playGame(){
-
-    if(!gameRunning) return;
-
-    if(keys.brake){
-
-        player.speed = 3;
-
-    }else{
-
-        player.speed = gameSpeed;
-    }
-
-    moveRoad();
-
-    moveLines();
-
-    moveEnemies();
-
-    moveBullets();
-
-    if(keys.left && player.x > 0){
-
-        player.x -= player.speed;
-    }
-
-    if(keys.right && player.x < 300){
-
-        player.x += player.speed;
-    }
-
-    bike.style.left =
-    player.x + "px";
-
-    animationId =
-    requestAnimationFrame(playGame);
-}
-
-/* END GAME */
-
-function endGame(){
-
-    gameRunning = false;
-
-    cancelAnimationFrame(animationId);
-
-    startScreen.style.display = "flex";
-
-    startScreen.innerHTML =
-
-    `
-    <h1>GAME OVER</h1>
-
-    <br>
-
-    SCORE : ${player.score}
-
-    <br><br>
-
-    <button class="levelBtn"
-    onclick="location.reload()">
-        PLAY AGAIN
-    </button>
-    `;
-}
 
 </script>
 
